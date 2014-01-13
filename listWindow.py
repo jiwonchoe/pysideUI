@@ -448,15 +448,16 @@ class bgCheckTool(QtGui.QWidget):
         return outList
 
     def fileName(self):
-        fileName = pm.sceneName().basename()[:-11]
+        fileName = pm.sceneName().basename().split('.')[0]
         rePath = str(self.outPathLineEditer.text()).replace('\\','/')
         self.outPathLineEditer.setText(rePath)
 
-        if not fileName == '':
-            newName = self.outPath.replace('untitled',fileName)
-        
-        if str(self.outPathLineEditer.text()).find('.') == -1:
-            newName = str(self.outPathLineEditer.text()) + '/' + fileName + '.mel'
+        if fileName == u'':
+            newName = os.path.dirname(rePath) + '/untitled.mel'
+        else:
+            newName = os.path.dirname(rePath) + '/' + fileName + '.mel'
+            if str(self.outPathLineEditer.text()).find('.') == -1:
+                newName = str(self.outPathLineEditer.text()) + '/' + fileName + '.mel'
 
         self.outPathLineEditer.setText(newName)
 
