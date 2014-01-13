@@ -241,26 +241,30 @@ class bgCheckTool(QtGui.QWidget):
                 referenceAttrList = referenceAttrList + k.referenceFile().getReferenceEdits()
 
         referenceAttrListFilter = []
-        self.progress.setRange(1, len(referenceAttrList))
+        if len(referenceAttrList) <= 1:
+            self.progress.setRange(1, len(referenceAttrList)+1)
+            print '?'
+        else:
+            self.progress.setRange(1, len(referenceAttrList))
         
         self.i = 1
         
         for x in referenceAttrList:
             self.i += 1
             self.progress.setValue(self.i)
-            if x[0:7] == 'setAttr':
+            if x[0:7] == 'setAttr' and pm.objExists(x.split(' ')[1].split('.')[0]):
                 if pm.objectType(x.split(' ')[1].split('.')[0]) == 'transform':
                     referenceAttrListFilter.append(x)
-            elif x[0:7] == 'connect':
+            elif x[0:7] == 'connect' and pm.objExists(x.split(' ')[1].split('.')[0]):
                 if pm.objectType(x.split('"')[3].split('.')[0]) == 'transform':
                     referenceAttrListFilter.append(x)
- 
+            
         referenceAttrListFilter = self.filterOutStringlist(referenceAttrListFilter, '-k 0 ')
     
         if self.listWg.count() >= 0:
             self.listWg.clear()
-            self.listWg.addItems(referenceAttrListFilter)   
-    
+            self.listWg.addItems(referenceAttrListFilter)
+
     def nodeFilter(self, getList):
         
         returnList = []
