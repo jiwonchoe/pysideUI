@@ -252,18 +252,42 @@ class bgCheckTool(QtGui.QWidget):
         for x in referenceAttrList:
             self.i += 1
             self.progress.setValue(self.i)
-            if x[0:7] == 'setAttr' and pm.objExists(x.split(' ')[1].split('.')[0]):
+
+            if x[0:7] == 'setAttr' and pm.objExists(x.split(' ')[1]):
                 if pm.objectType(x.split(' ')[1].split('.')[0]) == 'transform':
-                    referenceAttrListFilter.append(x)
-            elif x[0:7] == 'connect' and pm.objExists(x.split(' ')[1].split('.')[0]):
-                if pm.objectType(x.split('"')[3].split('.')[0]) == 'transform':
+                    if not pm.getAttr(x.split(' ')[1], l=1):
+                        referenceAttrListFilter.append(x)
+            elif x[0:7] == 'connect' and pm.objExists(x.split(' ')[2].replace('"','')):
+                print x.split(' ')[1].split('.')[0].replace('"','')
+                print  pm.objExists(x.split(' ')[2].replace('"',''))
+                if pm.objectType(x.split(' ')[2].split('.')[0].replace('"','')) == 'transform':
                     referenceAttrListFilter.append(x)
             
         referenceAttrListFilter = self.filterOutStringlist(referenceAttrListFilter, '-k 0 ')
     
         if self.listWg.count() >= 0:
             self.listWg.clear()
-            self.listWg.addItems(referenceAttrListFilter)
+            self.listWg.addItems(referenceAttrListFilter)   
+    
+    def nodeFilter(self, getList):
+        
+        returnList = []
+        
+        if len(getList) > 1 :
+
+            nodeList = []
+            for x in getList:
+                nodeList.append(x.referenceFile().refNode.name())
+            newList = list(set(nodeList))
+            
+            for i in newList:
+                returnList.append(pm.PyNode(i))
+            return returnList
+        else:
+            if not len(getList) == 0:
+                return getList
+            else:
+                return ['Not Select']
 
     def nodeFilter(self, getList):
         
